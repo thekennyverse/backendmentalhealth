@@ -14,7 +14,7 @@ CREATE TABLE users (
 INSERT INTO users ( username, password_hash) VALUES
 (
   'cloud7', 
-  'abc'
+  'abcd'
 );
 
 -- select everything
