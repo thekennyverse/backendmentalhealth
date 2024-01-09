@@ -9,7 +9,7 @@ const { loginUser, registerUser } = require('./users');
 require('dotenv').config();
 
 const app = express();
-const PORT = precess.env.PORT || 4000;
+const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(bodyParser.json());
 // app.use(express.json());
