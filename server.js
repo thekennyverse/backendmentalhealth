@@ -9,6 +9,7 @@ const { loginUser, registerUser } = require('./users');
 require('dotenv').config();
 
 const app = express();
+const serverless = require('serverless-http');
 const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(bodyParser.json());
@@ -33,6 +34,11 @@ app.post("/register", async (req, res) => {
   res.json({ authenticated });
 });
 */
+/*
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+*/
+
+module.exports = app;
+module.exports.handler = serverless(app);
