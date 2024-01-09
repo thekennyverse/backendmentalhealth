@@ -16,10 +16,11 @@ app.use(bodyParser.json());
 // app.use(express.urlencoded({extended: true}));
 
 
-app.get("/test", (req, res) => {
+
+app.get("/", (req, res) => {
   res.json({test: true});
 });
-
+/*
 app.post("/login", async (req, res) => {
   const loginData = req.body;
   const authenticated = await loginUser(loginData);
@@ -31,7 +32,7 @@ app.post("/register", async (req, res) => {
   const authenticated = await registerUser(loginData);
   res.json({ authenticated });
 });
-
+*/
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
