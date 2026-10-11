@@ -1,8 +1,11 @@
 const bcrypt = require('bcryptjs');
 const db = require('./database');
 
+const MIN_PASSWORD_LENGTH = 6;
+
 const loginUser = async (loginData = {}) => {
-    const { username, password } = loginData;
+    const username = (loginData.username || '').trim();
+    const { password } = loginData;
     if (!username || !password) return false;
 
     const user = await db.oneOrNone('SELECT password_hash FROM users WHERE username = $1', [username]);
@@ -12,9 +15,16 @@ const loginUser = async (loginData = {}) => {
 };
 
 const registerUser = async (loginData = {}) => {
-    const { username, password } = loginData;
+    const username = (loginData.username || '').trim();
+    const { password } = loginData;
     if (!username || !password) {
-        return { authenticated: false, error: 'Username and password are required' };
+        return { authenticated: false, error: 'Please enter a username and password.' };
+    }
+    if (username.length > 50) {
+        return { authenticated: false, error: 'Usernames can be at most 50 characters.' };
+    }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        return { authenticated: false, error: `Your password needs at least ${MIN_PASSWORD_LENGTH} characters.` };
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -24,7 +34,7 @@ const registerUser = async (loginData = {}) => {
         [username, passwordHash]
     );
     if (!created) {
-        return { authenticated: false, error: 'Username is already taken' };
+        return { authenticated: false, error: 'That username is already taken. Try a different one.' };
     }
     return { authenticated: true };
 }
