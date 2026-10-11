@@ -1,18 +1,12 @@
 const pgp = require('pg-promise')();
 const settings = require('./settings');
-const {user, password, host, database} = settings.postgresql;
+const { connectionString, user, password, host, database } = settings.postgresql;
 
-const db = pgp({
-    user,
-    password,
-    host,
-    port: 5432,
-    database,
-    ssl: {
-        rejectUnauthorized: false // To allow connection to Heroku PostgreSQL without SSL certificate validation
-    }
-});
+// Hosted Postgres providers (Neon, Supabase, Vercel Postgres, etc.) require SSL.
+const ssl = { rejectUnauthorized: false };
+
+const db = pgp(connectionString
+    ? { connectionString, ssl }
+    : { user, password, host, port: 5432, database, ssl });
 
 module.exports = db
-
-
