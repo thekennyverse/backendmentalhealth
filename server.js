@@ -1,64 +1,48 @@
 // server.js
+require('dotenv').config();
+
 const express = require('express');
+const cors = require('cors');
+const { loginUser, registerUser } = require('./users');
+
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(express.json()); // You will need this to make a POST request.
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.get('/', async (request, response) => {
-  response.send('Party time! Server is running!')
-})
-
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`)
-})
-
-
-
-// Here is your previous code
-// const express = require('express');
-// const bodyParser = require('body-parser');
-// const cors = require('cors');
-// const { loginUser, registerUser } = require('./users');
-
-
-
-// require('dotenv').config();
-
-// const app = express();
-// const serverless = require('serverless-http');
-// const PORT = process.env.PORT || 4000;
-// app.use(cors());
-// app.use(bodyParser.json());
-// app.use(express.json());
-// app.use(express.urlencoded({extended: true}));
-
-
-
-// app.get("/", (req, res) => {
-//   res.json({test: true});
-// });
-/*
-app.post("/login", async (req, res) => {
-  const loginData = req.body;
-  const authenticated = await loginUser(loginData);
-  res.json({ authenticated });
+app.get('/', (req, res) => {
+  res.json({ ok: true });
 });
 
-app.post("/register", async (req, res) => {
-  const loginData = req.body;
-  const authenticated = await registerUser(loginData);
-  res.json({ authenticated });
+app.post('/login', async (req, res) => {
+  try {
+    const authenticated = await loginUser(req.body);
+    res.json({ authenticated });
+  } catch (err) {
+    console.error('Login failed:', err);
+    res.status(500).json({ authenticated: false, error: 'Server error' });
+  }
 });
-*/
-/*
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-*/
 
-// module.exports = app;
-// module.exports.handler = serverless(app);
+app.post('/register', async (req, res) => {
+  try {
+    const result = await registerUser(req.body);
+    res.status(result.authenticated ? 201 : 400).json(result);
+  } catch (err) {
+    console.error('Registration failed:', err);
+    res.status(500).json({ authenticated: false, error: 'Server error' });
+  }
+});
+
+// On Vercel the app is exported as a serverless function; locally we listen on a port.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
