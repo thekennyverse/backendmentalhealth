@@ -8,6 +8,7 @@ const loginUser = async (loginData = {}) => {
     const { password } = loginData;
     if (!username || !password) return false;
 
+    await db.ensureSchema();
     const user = await db.oneOrNone('SELECT password_hash FROM users WHERE username = $1', [username]);
     if (!user) return false;
 
@@ -27,6 +28,7 @@ const registerUser = async (loginData = {}) => {
         return { authenticated: false, error: `Your password needs at least ${MIN_PASSWORD_LENGTH} characters.` };
     }
 
+    await db.ensureSchema();
     const passwordHash = await bcrypt.hash(password, 10);
     const created = await db.oneOrNone(
         `INSERT INTO users (username, password_hash) VALUES ($1, $2)
